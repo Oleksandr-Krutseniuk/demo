@@ -1,0 +1,8 @@
+---
+# handler for petclinic app
+- name: Daemon_reload
+  ansible.builtin.systemd: 
+    name: petclinic.service
+    state: restarted
+    daemon_reload: yes
+    enabled: yes

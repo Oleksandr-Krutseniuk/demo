@@ -1,0 +1,15 @@
+[Unit]
+Description=Start petclinic as a service
+Documentation=https://github.com/spring-projects/spring-petclinic
+Requires=cloud-sql-proxy.service
+After=cloud-sql-proxy.service
+
+[Service]
+WorkingDirectory=/opt/petclinic
+ExecStart=/bin/java -jar -Dspring.profiles.active=mysql {{jar_file_name}}
+Restart=always
+StandardOutput=journal
+User=petclinic
+
+[Install]
+WantedBy=multi-user.target

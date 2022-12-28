@@ -1,0 +1,2 @@
+[petclinic_app]
+petclinic_app-1 ansible_host=10.24.5.23 # if hostname won't be valid - change it to IP address

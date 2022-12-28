@@ -1,0 +1,21 @@
+---
+# task to install cloud sql proxy
+- name: Add "cloud_sql_user" user
+  ansible.builtin.user: 
+    name: cloud_sql_user
+    shell: /usr/bin/false
+    system: yes
+
+- name: Download & install cloud sql proxy 
+  ansible.builtin.get_url: 
+      url: https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64
+      dest: /usr/sbin/cloud_sql_proxy #надеюсь это имя, а не создание еще одной директории
+      owner: cloud_sql_user
+      group: cloud_sql_user
+      mode: 0755
+
+- name: Put cloud sql proxy template file in systemd folder and make it systemd-service
+  ansible.builtin.template: 
+    src: cloud-sql-proxy.service.j2
+    dest: /etc/systemd/system/cloud-sql-proxy.service
+  notify: SQL_reload     
