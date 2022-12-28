@@ -1,0 +1,15 @@
+
+
+This IaaC was created to facilitate a deployment of an application on a server. An application uses a remote database 
+(with private IP) as the app backend.
+
+  The infrastructure created via this code contains:
+
+  - VPC network and subnetwork (+ firewall rules);
+  - Compute instance with static IP;
+  - MySQL 5.7 instance with private IP;
+  - MySQL 5.7 database and it`s user;
+  - Private VPC connection to bind a compute instance with the MY_SQL database;
+  - another infrastructure components.
+
+
