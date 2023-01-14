@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: petclinic-config
+  namespace: petclinic
+data:
+  MYSQL_URL: jdbc:mysql:///petclinic?cloudSqlInstance=feisty-grid-366306:europe-west1:petclinic-db-tf-1bc962c0&socketFactory=com.google.cloud.sql.mysql.SocketFactory
+  JAVA_OPTS: Dspring.profiles.active=mysql  
