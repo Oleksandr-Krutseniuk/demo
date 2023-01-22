@@ -1,0 +1,9 @@
+This action allows user to push the data to a repository, build a JAR-artifact and download it to specified remote host.
+User is required to generate SSH key (ed25519 is highly recommended) and pass the following values to GitHub secrets:
+   REMOTE_HOST - IP- address where the artifact should be delievered to;
+   REMOTE_USER - username at the REMOTE HOST;
+   SSH_KEY     - private SSH key;
+   REMOTE_DIR  - directory on the REMOTE_HOST where an artifact should be uploaded to.
+After you performed actions outlined above - just make a push and get your artifact.
+
+
