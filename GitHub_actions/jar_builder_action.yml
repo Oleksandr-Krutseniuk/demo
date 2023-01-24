@@ -18,7 +18,7 @@ jobs:
         run: ./mvnw package
 
       - name: Copies a built artifact to destination folder
-        run: mkdir artifacts && cp target/*.jar artifacts/your_artifact.jar
+        run: mkdir artifacts && cp target/*.jar artifacts/your_artifact1.jar
       - name: Uploads a built artifact to destination folder  
         uses: actions/upload-artifact@v3
         with:
