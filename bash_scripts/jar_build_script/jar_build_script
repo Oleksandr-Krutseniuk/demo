@@ -8,12 +8,13 @@ if [ ! -z "$extra_jar" ]; then # check if no more than 1 variable was passed
 
 elif [ ! -z "$jarfile" ]; then # starts if the file has been found
   file jarfile | grep JAR
+  jarcheck=$(echo $?)
 : 'When "file" command is applied to a JAR-file it gives the output: <filename>: Java archive data (JAR). So, 
 if i`d like to check whether a file I`m looking for has a JAR-format, I take the "file" command`s output and 
 search for a word which is indispensable part of the output when a filetype defined as JAR. If you proceed 
 to view my code further you will see why I needed to perform "file" command coupled with "grep". 
 '
-  if [ $? == 0 ]; then # check if the provided file has a JAR format
+  if [ $jarcheck == 0 ]; then # check if the provided file has a JAR format
     sudo chmod u+x $jarfile
     java -jar $jarfile # to start a file Java 17 is needed
     address=$(curl ifconfig.me.)
@@ -21,7 +22,7 @@ to view my code further you will see why I needed to perform "file" command coup
   else 
     printf "Can\`t start your $jarfile (it is not a JAR format)\n"
   fi
-else #[ -z "$jarfile" ]; then
-  printf "Nothing has been found. \n Check if the filename is correct\n" # check whether the provided file is found
+else 
+  printf "Nothing has been found. Check if the filename is correct\n" # check whether the provided file is found
 
 fi
