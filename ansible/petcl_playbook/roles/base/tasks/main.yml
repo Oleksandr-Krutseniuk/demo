@@ -1,0 +1,10 @@
+---
+- name: JDK installation& update/upgrade commands
+  ansible.builtin.apt: 
+    name: "{{item}}"
+    state: present
+    install_recommends: no
+    update_cache: yes
+  loop: 
+    - python-pip
+    - openjdk-11-jdk

@@ -1,0 +1,1 @@
+This playbook will install docker, docker-compose and required dependencies for RHEL, Debian-like systems

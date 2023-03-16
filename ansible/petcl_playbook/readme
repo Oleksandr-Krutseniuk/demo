@@ -1,0 +1,4 @@
+The playbook was created to run an application on a server with a remote database as an applications backend.
+  With this playbook Ansible retrieves pre-built app from Google Cloud storage on a server. To provision a remote MySQL database
+  as a backend for an app the Cloud SQL Proxy is used. To make an app running continuously both app and proxy are made the 
+  systemd processes.

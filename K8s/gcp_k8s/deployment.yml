@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: petclinic
+  namespace: petclinic
+  labels:
+    app: petclinic
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: petclinic
+  template:
+    metadata:
+      labels:
+        app: petclinic
+    spec:
+      containers:
+        - name: petclinic
+          image: gcr.io/feisty-grid-366306/petclinic@sha256:b943c81d3bcd4cab69b6730556800378df5538fec71c58164e7f5b926287ef0c
+          ports:
+          - containerPort: 8080
+          resources:
+            requests: 
+              memory: "800Mi"
+              cpu: "200m"
+            limits: 
+              memory: "1024Mi"
+              cpu: "400m"
+          env:
+            - name: MYSQL_URL
+              valueFrom:
+                configMapKeyRef: 
+                  name: petclinic-config
+                  key: MYSQL_URL
+            - name: JAVA_OPTS
+              valueFrom:
+                configMapKeyRef: 
+                  name: petclinic-config
+                key: JAVA_OPTS          
+
+        

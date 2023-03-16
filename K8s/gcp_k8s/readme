@@ -1,0 +1,5 @@
+Yamls intended at provisioning 3 replicas of containers with an application inside. Attached config-map is used to pass 2 variables:
+-	 MYSQL_URL – the value contains the address of a remote SQL database, created at Google cloud platform.
+-	JAVA_OPTS – the value switches the profile of a containerized application so that an app is able to communicate with a remote database.
+By passing the mentioned vars application stores its data on a remote MySQL database instead of the local one.
+
