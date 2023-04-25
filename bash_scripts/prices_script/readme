@@ -1,0 +1,4 @@
+This script uses the associative array to form the goods list with their related prices.
+Sometimes markets need to increase price for a particular good, so this script allows you
+to search for a particular prices range (in this case where the price is lower that 5) and
+change the price if needed.
