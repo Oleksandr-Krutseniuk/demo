@@ -11,21 +11,21 @@ while true; do
         break
     fi
       
-      if ! head -n 1 employees.txt | grep -q -E "Profession|Employee" 2> /dev/null; then # add a header at the top of a file 
+    if ! head -n 1 employees.txt | grep -q -E "Profession|Employee" 2> /dev/null; then # add a header at the top of a file 
       echo -e "Employee \t\tProfession\n" > employees.txt
-      fi
+    fi
 
-      if [[ ! $name =~ ^[[:alpha:]]+$ ]]; then # check whether the value contains letters only
+    if [[ ! $name =~ ^[[:alpha:]]+$ ]]; then # check whether the value contains letters only
         echo "Name can't contain numbers or symbols (if you're not Musk's XÆA-Ⅻ  )"
         sleep 0.7
         continue # go back to the beginning of the loop if provided name is wrong
-      fi
+    fi
 
-      if [[ ${people[$name]} ]]; then # check if name already exists in the associative array
+    if [[ ${people[$name]} ]]; then # check if name already exists in the associative array
         echo "The name '$name' already exists in the employee list. Please enter a different name."
         sleep 0.7
         continue # go back to the beginning of the loop if name already exists
-      fi
+    fi
 
     read -p "Enter employee's profession: " profession
     people["$name"]=$profession
