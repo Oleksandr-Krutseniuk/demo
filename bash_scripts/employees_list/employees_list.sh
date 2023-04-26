@@ -22,7 +22,7 @@ while true; do
     fi
 
     if [[ ${people[$name]} ]]; then # check if name already exists in the associative array
-        echo "The name '$name' already exists in the employee list. Please enter a different name."
+        echo "Employee '$name' is already in the employees list. Please enter a different name."
         sleep 0.7
         continue # go back to the beginning of the loop if name already exists
     fi
