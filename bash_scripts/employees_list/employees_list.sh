@@ -112,7 +112,7 @@ case $option in
     else 
       read -p "Enter new profession for $name employee"$'\n' new_profession  
       people["$name"]=$new_profession # change profession in the associative array
-      sed -i "s/^$name\s.*/$name $(printf '%*s' $((19-${#name})) '' ) $new_profession/g" employees.txt
+      sed -i "s/^$name\s.*/$name $(printf '%*s' $((19-${#name})) '' ) $new_profession/g" employees.txt # changes string adding a new profession
       sleep 0.7
       echo -e "The profession of '$name' has been changed to '$new_profession'\n"
       continue
