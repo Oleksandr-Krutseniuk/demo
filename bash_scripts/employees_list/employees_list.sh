@@ -37,21 +37,21 @@ case $option in
       break
     fi
 
-    name="${first_name} ${second_name}"
+    name="${first_name} ${second_name}" # combine name+surname to 1 value (which will become an index name)
       
 
-    if ! head -n 1 employees.txt | grep -q -E "Profession|Employee" 2> /dev/null; then # add a header at the top of a file 
-      printf "%-20s %-22s\n" "Employee" $'Profession\n' > employees.txt
+    if ! head -n 1 employees.txt | grep -q -E "Profession|Employee" 2> /dev/null; then # add a header at the top of a file --------------->
+      printf "%-20s %-22s\n" "Employee" $'Profession\n' > employees.txt                # ---> in case user uses script for the 1 time
     fi
 
-    if [[ ! $name =~ ^[[:alpha:]]+[[:space:]][[:alpha:]]+$ ]]; then # check whether the value contains letters only
-      echo "Please enter employee's name and surname" # to remake !!!
+    if [[ ! $name =~ ^[[:alpha:]]+[[:space:]][[:alpha:]]+$ ]]; then # check if the value contains letters only (name+surname separated by space)
+      echo "Please enter employee's name and surname"  
       sleep 0.7
       continue # go back to the beginning of the loop if provided name is wrong
     fi
 
     if [[ ${people["$name"]} ]]; then # check if name already exists in the associative array
-      echo "The name '$name' already exists in the employee list. Please enter a different name."
+      echo "The '$name' is already in the employee list. Please enter a different name."
       sleep 0.7
       continue # go back to the beginning of the loop if name already exists
     else
@@ -64,11 +64,11 @@ case $option in
   done
   sleep 0.7
 
-  if [ ${#new_people[@]} -eq 0 ]; then
+  if [ ${#new_people[@]} -eq 0 ]; then # starts if no new empoyees names were provided 
     sleep 0.7 && echo "No new employees added."
   else 
     printf "%-24s" $'\nPeople added:' && printf "%-21s\n" $'Profession\n'
-    for name in "${!new_people[@]}"; do # "!" в цикле позволяет пройтись по ключам вместо значений
+    for name in "${!new_people[@]}"; do # when "!" is used loop tries indexes instead of array's values
       sleep 0.7
       printf "%-23s" "$name" && printf "%-20s\n" "${new_people[$name]}"
     done
@@ -84,7 +84,7 @@ case $option in
     if [ "$name" == "exit" ]; then # cycle works until "done" is printed
       break
       
-    elif [[ ! ${people[$name]} ]]; then
+    elif [[ ! ${people[$name]} ]]; then # check whether an employee user deletes is present in the employees list
       echo "The name '$name' does not exist in the employee list."
       sleep 0.7
       continue
@@ -92,7 +92,7 @@ case $option in
     else
       unset people[$name] # remove employee from associative array
       # remove employee's data from file
-      sed -i "/^$name\s/ d" employees.txt && sleep 0.5
+      sed -i "/^$name\s/ d" employees.txt && sleep 0.5 # search for a string starting with employee's name and remove it
       echo -e "The '$name' has been removed from the employee list\n"
       continue
     fi
