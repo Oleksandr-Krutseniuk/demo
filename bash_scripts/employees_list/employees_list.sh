@@ -91,7 +91,7 @@ case $option in
     echo -e "\nYour employees file is empty. Add some people to your team first"
     break
 
-  elif [ ${#people[@]} -eq 0 ]; then  #used when user deleted all empoyees and tries to modify their profession
+  elif [ ${#people[@]} -eq 0 ]; then  # used when user has no or deleted empoyees and tries to modify their profession
     sleep 0.7
     echo "Your employees list is empty. Time to hire new team!"
     break
