@@ -95,7 +95,9 @@ case $option in
     sleep 0.7
     echo "Your employees list is empty. Time to hire new team!"
     break
-  fi  
+  fi # this block needed for the cases such as if user starts block 1 in case condition and doesn't add any employees (+original emp_list
+  # is empty). Then if user tries to delete someone he will get a message that emp_list is empty before he recieves a message
+  # "Enter the name of the employee you want to remove"
 
   read -e -p $'Enter the name of the employee you want to remove or press \'exit\' to quit\n' name 
   
@@ -114,15 +116,14 @@ case $option in
     # "people[name+space+surname]" 
     sed -i "/^$name\s/ d" employees.txt && sleep 0.5 # search for a string starting with employee's name and remove it
     echo -e "The '$name' has been removed from the employee list\n"
-        if [ ${#people[@]} -eq 0 ]; then
-        echo "Your employees list is empty. Time to hire new team!"
-        break
+        if [ ${#people[@]} -eq 0 ]; then # activated if user deleted all the empoyees
+          echo "Your employees list is empty. Time to hire new team!"
+          break
         fi
     
   else
     echo "The name '$name' does not exist in the employee list."
     sleep 0.7
-   
   fi
    
 done
@@ -140,8 +141,7 @@ done
     elif [ ${#people[@]} -eq 0 ]; then #used when user deleted all empoyees and tries to modify their profession
       sleep 0.7
       echo "Your employees list is empty. Time to hire new team!"
-    break
- 
+      break
     fi  
 
   read -e -p $'Enter the name of the employee whose profession you want to update or press \'exit\' to quit\n' name
@@ -150,12 +150,10 @@ done
 
     elif [[ -z "$name" ]]; then
       echo "You didn't enter employee's name"
-      #continue
       sleep 0.7
     elif [[ ! ${people[$name]} ]]; then # check whether an employee is in the list
       echo -e "The name '$name' does not exist in the employee list\n"
       sleep 0.7
-      #continue # go back to the beginning of the loop if name does not exist
     else 
       read -p "Enter new profession for $name employee"$'\n' new_profession  
       people["$name"]=$new_profession # change profession in the associative array
@@ -165,7 +163,6 @@ done
 # from the 1 string of a file,which makes a file comfortable to read.        
       sleep 0.7
       echo -e "The profession of '$name' has been changed to '$new_profession'\n"
-      #continue
     fi
   done
     ;;           
