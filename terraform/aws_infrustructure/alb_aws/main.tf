@@ -1,4 +1,3 @@
-
 # remote state file in S3 bucket. bucket should exist before infrustructure deployment
 terraform {
 backend "s3" {
@@ -420,4 +419,3 @@ resource "aws_security_group" "wordpress_rds_sg" {
 
   
   }
-
