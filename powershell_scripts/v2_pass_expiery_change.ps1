@@ -1,70 +1,56 @@
 
+$enabledUsers = Get-LocalUser | Where-Object { $_.Enabled -eq $true }
 
-$enabledUsers = Get-LocalUser | Where-Object { $_.Enabled -eq $true } # список всех локальных пользователей на компьютере, которые включены (Enabled)
-
-Write-Host "`n`nUsername         New_Message_Duration" # дает эстетически оптимальный вывод измененных значений MessageDuration
-Write-Host "-----------------------------------"
-
-$newMessageDuration = 1200
+Write-Host ("`n`n{0,-20} {1}" -f "Username", "New_Message_Duration") # ""`n`n{0,-20} {1}"" - форматує вивід.перший стовпчик - 20 символів,2ий-стратує з 21шого
+Write-Host "-----------------------------------------"
+$newMessageDuration = 91 # строк в секундах
 
 foreach ($user in $enabledUsers) {
-    # в ProfileList лежат профили пользователей в виде директорий соответствующих SID пользователя. В ProfileImagePath лежит значение=домашняя директория пользователя
-    # она будет нужна для доступа к файлу профился пользователя - NTUSER.DAT
-    $userProfilePath = Get-ItemPropertyValue -Path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\$($user.SID.Value)" -Name "ProfileImagePath"
+    # шлях до гілки з профілями користувачів + директорія з профілем відповідного користувача
+    $profileListPath = "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\$($user.SID.Value)"
+    $registryPath = "Registry::HKEY_USERS\$($user.SID.Value)\Control Panel\Accessibility" # в цьому розділі реєєстру знаходиться ключ "MessageDuration"
     
-    # строка создает полный путь к файлу NTUSER.DAT пользователя. NTUSER.DAT - это файл с конфигурацией для каждого пользователя.
-    $ntuserDatPath = Join-Path -Path $userProfilePath -ChildPath "NTUSER.DAT" 
-    $registryPath = "Registry::HKEY_USERS\$($user.SID.Value)\Control Panel\Accessibility" # это уже путь к разделу реестра с загруженными профилями пользователей
-    
-    # проверяет загружен ли профиль пользователя в HKEY_USERS. работает с пользователями, которые подключены к серверу в момент запуска скрипта
-    # если путь существует - значит пользователь есть в HKEY_USERS, значит можно напрямую с HKEY_USERS редактировать MessageDuration 
-    if (Test-Path $registryPath) { 
-        Set-ItemProperty -Path $registryPath -Name "MessageDuration" -Value $newMessageDuration
-        Write-Host "$($user.Name)            $($newMessageDuration)"
+    if (-not (Test-Path $profileListPath)) { # сценарій для обробки користувачів без профіля (створені, але ні разу не логінились)
+        Write-Host ("Probably, user '{0}' has not logged on to the server yet. First login needed before 'MessageDuration' value could be changed" -f $user.Name)
+        continue
     }
-# в HKEY_USERS находятся только пользователи с активным сеансом с сервером.неподключенным пользователям нельзя отредактировать значение MessageDuration в HKEY_USERS,
-# поэтому в их случае нужно специально загружать их профиль пользователя в HKEY_USERS. Это и будет делать "elseif"  
-     
-    elseif (Test-Path $ntuserDatPath) { # проверяет, есть ли профиль пользователя в его домашней директории. команда в первой строке скрипта подтягивает только 
-        # существующих активированных пользователей (которые "Enabled"), а они или в HKEY_USERS (тогда выполняется первая проверка условия if) или нет.
-        # Если нет-выполняется эта проверка, которая подтверждает что у пользователя есть профиль в домашней директории, а значит он является зарегистрированным
-        # пользователем на сервере. 
-        
-        # тут "try" - аналог "if" без "else". 
+    elseif (Test-Path $registryPath) { # якщо користувач підключений - він є в реєстрі, тому можна зразу редагувати значення
+        Set-ItemProperty -Path $registryPath -Name "MessageDuration" -Value $newMessageDuration
+        Write-Host ("{0,-20} {1}" -f $user.Name, $newMessageDuration)
+    }
+    else { # якщо користувач зареєстрований на сервері, вже має профіль, але в офлайні - підвантажую його в реєєстр і в реєстрі змінюю значення
+        $userProfilePath = Get-ItemPropertyValue -Path $profileListPath -Name "ProfileImagePath"  # домашня папка користувача (напр. C:\Users\<USERNAME>)
+        $ntuserDatPath = Join-Path -Path $userProfilePath -ChildPath "NTUSER.DAT"  # файл профілю користувача(userProfilePath+NTUSER.DAT - напр. C:\Users\<USERNAME>\USER.DAT)
         try {               
-            
-            # эта команда загружает профиль неподключенного пользователя в HKEY_USERS (как будто он подключен) а потом напрямую в HKEY_USERS переписывает значение 
-            # MessageDuration. Это изменение не будет временным - оно должно сохранится статически (постоянно).
-                            # HKU = HKEY_USERS
-            $null = reg load "HKU\$($user.SID.Value)" $ntuserDatPath # чат говорит, что если результат команды присвоить переменной "null", то ее вывод не отобразиться 
-            # в консоли. или может быть вывод в принципе не отобразиться в консоли, если присвоить его переменной (а null здесь для интерактивного понимания того, что
-            # вывод не нужен)
-            Set-ItemProperty -Path $registryPath -Name "MessageDuration" -Value $newMessageDuration # тут уже обычное редактирование ключа в HKEY_USERS
-            Write-Host "$($user.Name)            $($newMessageDuration)"
-            # Write-Host "$($user.Name)    `t         $($newMessageDuration)"
+            $null = reg load "HKU\$($user.SID.Value)" $ntuserDatPath # загрузка NTUSER.DAT в гілку реєєстра, назва якої відповідає SIDу користувача.
+            Set-ItemProperty -Path $registryPath -Name "MessageDuration" -Value $newMessageDuration # зміна MessageDuration в реєстрі
+            Write-Host ("{0,-20} {1}" -f $user.Name, $newMessageDuration)
         }
         finally {
-            # цикл используется для повторных попыток выгрузки профиля пользователя из реестра. Если выгрузка не удается, он ждет некоторое время и пытается снова. 
-            # Цикл будет продолжаться, пока выгрузка не будет успешной, или пока не будет сделано три неудачные попытки.
             $retryCount = 0
-            while ($true) { # а "try"/"catch"- это уже похоже на "if" - "else"(только проверяются не условия).То есть,если в "try" команда будет выполнена с ошибкой -> 
-                try {                                                                                                                  # -< то будет выполнен "catch"
-                  $null = reg unload "HKU\$($user.SID.Value)" # выгружает профиль пользователя с HKEY_USERS.если выгрузки не будет-изменения профиля могут не сохраниться
-                  break # нужен чтоб остановить цикл, когда профиль выгрузится с HKEY_USERS                                                                                                     
+            while ($true) { 
+                try {                                                                                                                 
+                    $null = reg unload "HKU\$($user.SID.Value)" # вивантаження "офлайн" - користувача з реєстру.
+                    break                                                                                                    
                 }
-                catch { # делает 3 попытки выгрузить профиль пользователя HKEY_USERS. на 3 попытке вырубает скрипт и выводит сообщение об провале выгрузки 
+                catch { # якщо в "try" помилка - робиться 3 спроби вивантаження (саме тому ці блоки в "while").на 3 спробі цикл вимикається  
                     if ($retryCount -ge 3) {
                         Write-Host "Failed to unload registry hive for user $($user.Name) after $retryCount attempts."
                         break
                     }
-                    else { # считает количество неудачных выгрузок и делает между попытками выгрузок небольшой sleep
-                        Start-Sleep -Seconds (2 * $retryCount)
+                    else { 
+                        Start-Sleep -Seconds (2 * $retryCount) # короткий sleep між спробами вивантажити профіль з реєєстру
                         $retryCount++
                     }
                 }
             }
         }
     }
+   
 }
 
-Write-Host "-----------------------------------`n`n" # а это просто для красоты
+Write-Host "-----------------------------------------`n`n"
+
+# за бажання можна об'єднати userProfilePath і $ntuserDatPath в 1 змінну - $ntuserDatPath = Join-Path -Path (Get-ItemPropertyValue -Path 
+# "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\$($user.SID.Value)" -Name "ProfileImagePath")
+# -ChildPath "NTUSER.DAT". Але вона робить скрипт не дуже читабельним - довгувата трохи
