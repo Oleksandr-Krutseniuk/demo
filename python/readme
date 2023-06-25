@@ -1,5 +1,0 @@
-This script allows for DNS records transfer from Cloudflare to Google Sheet. To make it work you need:
-- Google cloud platform project enabled;
-- GCP service account and its key;
-- Cloudflare token;
-- computer
