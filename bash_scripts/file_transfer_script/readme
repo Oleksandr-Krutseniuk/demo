@@ -1,0 +1,2 @@
+Here is a script that dumps the database on host A, sends it to host B, checks the hash sum and commits
+log results.
